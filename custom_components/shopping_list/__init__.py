@@ -350,7 +350,7 @@ class ShoppingData:
             }
         )
         self.items.append(item.to_ha())
-        event.fire('shopping_list_updated','add',item)
+        #event.fire('shopping_list_updated','add',item)
         await self.bring.purchase_item(item)
         self.map_items[item.id] = item
         await self.sync_bring()
