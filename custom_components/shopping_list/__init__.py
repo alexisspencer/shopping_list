@@ -109,7 +109,6 @@ async def async_setup_entry(hass, config_entry):
         if name is not None:
             await data.async_add(name)
 
-
     async def complete_item_service(call):
         """Mark the item provided via `name` as completed."""
         data = hass.data[DOMAIN]
@@ -353,7 +352,6 @@ class ShoppingData:
         self.items.append(item.to_ha())
         #event.fire('shopping_list_updated','add',item)
         await self.bring.purchase_item(item)
-        self.hass.bus.fire("shopping_list_updated", {"action": "add", "item": item})
         self.map_items[item.id] = item
         await self.sync_bring()
         await self.hass.async_add_executor_job(self.save)
@@ -387,9 +385,8 @@ class ShoppingData:
             await self.bring.recent_item(item)
         else:
             await self.bring.purchase_item(item)
-        self.hass.bus.fire("shopping_list_updated", {"action": "update", "item": item})
         self.update_item(item_id, item)
-        
+        event.fire('shopping_list_updated','update',item)
         await self.sync_bring()
         await self.hass.async_add_executor_job(self.save)
         return item.to_ha()
