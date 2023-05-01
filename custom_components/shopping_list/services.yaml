@@ -16,6 +16,12 @@ incomplete_item:
     name:
       description: The name of the item to mark as incompleted.
       example: Beer
+remove_item:
+  description: Remove the first item with matching name in the shopping list.
+  fields:
+    name:
+      description: The name of the item to mark as incompleted.
+      example: Beer
 bring_sync:
   description: Syncs with Bring Shopping List.
 bring_select_list:
