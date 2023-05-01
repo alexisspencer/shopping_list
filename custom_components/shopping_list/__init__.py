@@ -32,6 +32,7 @@ PERSISTENCE = ".shopping_list.json"
 
 SERVICE_ADD_ITEM = "add_item"
 SERVICE_COMPLETE_ITEM = "complete_item"
+SERVICE_INCOMPLETE_ITEM = "incomplete_item"
 SERVICE_BRING_SYNC = "bring_sync"
 SERVICE_BRING_SELECT_LIST = "bring_select_list"
 SERVICE_REMOVE_COMPLETED_ITEMS = "remove_completed_items"
@@ -122,6 +123,19 @@ async def async_setup_entry(hass, config_entry):
         else:
             await data.async_update(item["id"], {"name": name, "complete": True})
 
+    async def incomplete_item_service(call):
+        """Mark the item provided via `name` as incompleted."""
+        data = hass.data[DOMAIN]
+        name = call.data.get(ATTR_NAME)
+        if name is None:
+            return
+        try:
+            item = [item for item in data.items if item["name"] == name][0]
+        except IndexError:
+            _LOGGER.error("Removing of item failed: %s cannot be found", name)
+        else:
+            await data.async_update(item["id"], {"name": name, "complete": False})
+
     async def bring_sync_service(call):
         """Sync with Bring List"""
         await hass.data[DOMAIN].sync_bring()
@@ -161,6 +175,9 @@ async def async_setup_entry(hass, config_entry):
     )
     hass.services.async_register(
         DOMAIN, SERVICE_COMPLETE_ITEM, complete_item_service, schema=SERVICE_ITEM_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_INCOMPLETE_ITEM, incomplete_item_service, schema=SERVICE_ITEM_SCHEMA
     )
     hass.services.async_register(
         DOMAIN, SERVICE_BRING_SYNC, bring_sync_service, schema={}
